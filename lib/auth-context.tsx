@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { User, onAuthStateChanged, signOut } from "firebase/auth"
 import { auth, database } from "./firebase"
-import { ref, set, remove, onValue, onDisconnect } from "firebase/database"
+import { ref, set, remove, onValue, onDisconnect, DataSnapshot } from "firebase/database"
 import { useRouter, usePathname } from "next/navigation"
 
 const SESSION_KEY = "adminSessionId"
@@ -46,9 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const sessionRef = ref(database, SESSION_DB_PATH)
 
         // Read current active session from DB
-        const snapshot = await new Promise<ReturnType<typeof onValue>>((resolve) => {
+        const snapshot = await new Promise<DataSnapshot>((resolve) => {
           onValue(sessionRef, resolve, { onlyOnce: true })
-        }) as any
+        })
 
         const existing = snapshot.val()
 
