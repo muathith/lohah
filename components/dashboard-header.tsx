@@ -1,9 +1,8 @@
 "use client"
 
-import { useAuth } from "@/lib/auth-context"
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
-import { Settings, LogOut, Activity, Users, Calendar, CreditCard, Smartphone } from "lucide-react"
+import { Settings, Activity, Users, Calendar, CreditCard, Smartphone } from "lucide-react"
 
 interface AnalyticsData {
   activeUsers: number
@@ -16,7 +15,6 @@ interface AnalyticsData {
 }
 
 export function DashboardHeader() {
-  const { user, logout } = useAuth()
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     activeUsers: 0,
     todayVisitors: 0,
@@ -46,8 +44,6 @@ export function DashboardHeader() {
     const interval = setInterval(fetchAnalytics, 30000)
     return () => clearInterval(interval)
   }, [])
-
-  if (!user) return null
 
   const stats = [
     {
@@ -122,22 +118,6 @@ export function DashboardHeader() {
               title="إعدادات"
             >
               <Settings className="w-4 h-4" />
-            </button>
-
-            <div className="hidden md:flex flex-col items-end">
-              <p className="text-xs font-medium" style={{ color: "#e2e8f0" }}>{user.email}</p>
-              <p className="text-[10px]" style={{ color: "rgba(148,163,184,0.5)" }}>مسؤول النظام</p>
-            </div>
-
-            <button
-              onClick={logout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
-              style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.2)" }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.1)" }}
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">تسجيل الخروج</span>
             </button>
           </div>
         </div>
