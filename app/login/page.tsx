@@ -11,9 +11,11 @@ import {
   AlertCircle,
   CheckCircle2,
   ArrowLeft,
+  ShieldAlert,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth-context";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,6 +24,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const navigate = useRouter();
+  const { sessionBlocked } = useAuth();
 
   const handleSendLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,8 +112,23 @@ export default function LoginPage() {
               </p>
             </div>
 
+            {sessionBlocked && (
+              <div className="flex items-start gap-3 px-4 py-4 rounded-xl mb-6"
+                style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
+                <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#f87171" }} />
+                <div>
+                  <p className="text-sm font-semibold mb-0.5" style={{ color: "#fca5a5" }}>
+                    جلسة نشطة بالفعل
+                  </p>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(252,165,165,0.75)" }}>
+                    المدير مسجّل الدخول بالفعل من جهاز آخر. لا يُسمح بأكثر من جلسة واحدة في نفس الوقت.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {!sent ? (
-              <form onSubmit={handleSendLink} className="space-y-4">
+              <form onSubmit={handleSendLink} className="space-y-4" style={sessionBlocked ? { pointerEvents: "none", opacity: 0.4 } : {}}>
                 <div className="space-y-1.5">
                   <label htmlFor="email" className="block text-xs font-semibold tracking-wide uppercase"
                     style={{ color: "rgba(148,163,184,0.7)" }}>
